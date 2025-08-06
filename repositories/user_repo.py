@@ -14,8 +14,3 @@ class UserRepository:
         self.db.add(user)
         self.db.commit()
 
-    # def get_all(self):
-    #     return self.db.query(User).all()
-    #
-
-

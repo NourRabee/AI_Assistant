@@ -6,7 +6,8 @@ from services.jwt import JwtService
 
 EXCLUDED_PATHS = [
     "/api/auth/sign_up",
-    "/api/auth/login"
+    "/api/auth/login",
+    "/api/auth/password_reset_request"
 ]
 
 
