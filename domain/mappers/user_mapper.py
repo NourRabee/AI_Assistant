@@ -1,6 +1,6 @@
 from domain.schemas.signup_request import SignUpRequest
 from domain.schemas.signup_response import SignUpResponse
-from models import User
+from domain.models import User
 
 
 class UserMapper:
