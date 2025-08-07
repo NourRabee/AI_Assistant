@@ -69,12 +69,11 @@ def verified_password_reset_token(request: VerifyPasswordResetToken,
 
 @router.post("/reset-password")
 def reset_password(request: PasswordReset, auth_service: AuthService = Depends(get_auth_service)):
-    isResetSuccessful = auth_service.reset_password(request)
+    isResetSuccessful, message = auth_service.reset_password(request)
     if isResetSuccessful:
         return {
-            "message": "Your password has been successfully reset. You can now log in with your new password."
+            "message": message
         }
     return {
-        "message": "This password may have been used before. Try a new one."
+        "message": message
     }
-

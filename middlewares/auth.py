@@ -9,6 +9,7 @@ EXCLUDED_PATHS = [
     "/api/auth/login",
     "/api/auth/password_reset_request",
     "/api/auth/verify-password-reset-token",
+    "/api/auth/reset-password",
 ]
 
 

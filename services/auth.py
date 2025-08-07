@@ -16,7 +16,7 @@ class AuthService:
     def __init__(self, db: Session):
         self.user_repo = UserRepository(db)
         self.user_mapper = UserMapper()
-        self.password_Service = PasswordService()
+        self.password_Service = PasswordService(db)
         self.jwt_service = JwtService()
         self.password_reset_token_repo = PasswordResetTokenRepository(db)
         self.email_service = EmailService(db)
@@ -65,4 +65,16 @@ class AuthService:
         return False
 
     def reset_password(self, request):
-        pass
+        user = self.user_repo.get_by_email(request.email)
+
+        if not isinstance(request.new_password, str):
+            return False, "Password must be string"
+        if not self.password_Service.is_password_strong(request.new_password):
+            return False, "Password must be strong"
+
+        if self.password_Service.verifyPassword(request.new_password, user.hashed_password):
+            return False, "Password reset failed. Please ensure all information is correct and try again."
+
+        new_hashed_password = self.password_Service.hashPassword(request.new_password)
+        self.user_repo.update_password(user, new_hashed_password)
+        return True, "Your password has been successfully reset. You can now log in with your new password."

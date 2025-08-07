@@ -14,3 +14,7 @@ class UserRepository:
         self.db.add(user)
         self.db.commit()
 
+    def update_password(self, user: User, new_hashed_password: str):
+        user.hashed_password = new_hashed_password
+        self.db.commit()
+
