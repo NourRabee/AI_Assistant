@@ -15,3 +15,4 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     reset_tokens = relationship("PasswordResetToken", back_populates="user")
+    conversations = relationship("Conversation", back_populates="user")

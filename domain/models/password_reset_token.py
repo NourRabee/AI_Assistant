@@ -10,7 +10,7 @@ def two_minutes_from_now():
 
 
 class PasswordResetToken(Base):
-    __tablename__ = 'password_reset_token'
+    __tablename__ = 'password_reset_tokens'
 
     id = Column(Integer, primary_key=True)
     token = Column(String(255), nullable=False)

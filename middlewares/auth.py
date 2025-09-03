@@ -22,7 +22,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
         if any(request.url.path.startswith(path) for path in EXCLUDED_PATHS):
             return await call_next(request)
         try:
-            self.jwt_service.verify_jwt_token(request)
+            payload = self.jwt_service.verify_jwt_token(request)
+            request.state.jwt_payload = payload
+            request.state.user_id = int(payload['sub'])
             response = await call_next(request)
             return response
         except HTTPException as exc:

@@ -58,7 +58,7 @@ class AuthService:
 
     def verified_password_reset_token(self, request):
         user = self.user_repo.get_by_email(request.email)
-        valid_token = self.password_reset_token_repo.get_valid_token_by_user_id(user.id)
+        valid_token = self.password_reset_token_repo.get_val6id_token_by_user_id(user.id)
         if user and valid_token and request.token == valid_token.token:
             self.password_reset_token_repo.mark_token_as_used(valid_token)
             return True
@@ -67,11 +67,7 @@ class AuthService:
     def reset_password(self, request):
         user = self.user_repo.get_by_email(request.email)
 
-        if not isinstance(request.new_password, str):
-            return False, "Password must be string"
-        if not self.password_Service.is_password_strong(request.new_password):
-            return False, "Password must be strong"
-
+        # checking if the entered password is the same as the one in the db.
         if self.password_Service.verifyPassword(request.new_password, user.hashed_password):
             return False, "Password reset failed. Please ensure all information is correct and try again."
 

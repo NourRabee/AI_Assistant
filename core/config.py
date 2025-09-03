@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     EMAIL: str
     MAIL_PASSWORD: str
+    GROQ_BASE_URL: str
+    GROQ_API_KEY: str
 
     class Config:
         env_file = ".env"
@@ -15,3 +17,5 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+print(settings.DB_URL)
