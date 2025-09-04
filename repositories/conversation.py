@@ -1,15 +1,8 @@
-from sqlalchemy.orm import Session
-
 from domain.models import Conversation, Message
+from repositories.base_repo import BaseRepository
 
 
-class ConversationRepository:
-    def __init__(self, db: Session):
-        self.db = db
-
-    def save(self, conversation: Conversation):
-        self.db.add(conversation)
-        self.db.commit()
+class ConversationRepository(BaseRepository):
 
     def get_messages(self, user_id: int, conversation_id: int):
         conversation = self.db.query(Conversation).filter_by(id=conversation_id, user_id=user_id).first()

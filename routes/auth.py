@@ -3,11 +3,9 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from db_config import get_db
-from domain.schemas.login_request import LogInRequest
-from domain.schemas.password_reset import PasswordReset
-from domain.schemas.password_reset_request import PasswordResetRequest
-from domain.schemas.signup_request import SignUpRequest
-from domain.schemas.verify_password_reset_token import VerifyPasswordResetToken
+from domain.schemas.auth_schemas import SignUpRequest, LogInRequest
+from domain.schemas.password_reset_schemas import PasswordResetRequest, VerifyPasswordResetToken, PasswordReset
+
 from services.auth import AuthService
 
 router = APIRouter(prefix="/api/auth")
@@ -24,7 +22,7 @@ def sign_up(
 ):
     user_id = auth_service.register(request)
 
-    if user_id is None:
+    if not user_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A user with this email already exists."

@@ -1,17 +1,16 @@
-from sqlalchemy.orm import Session
-
 from domain.models import User
+from repositories.base_repo import BaseRepository
 
 
-class UserRepository:
-    def __init__(self, db: Session):
-        self.db = db
+class UserRepository(BaseRepository):
 
     def get_by_email(self, email: str):
         return self.db.query(User).filter(User.email == email).first()
 
-    def save(self, user: User):
+    def add(self, user: User):
         self.db.add(user)
+
+    def commit(self):
         self.db.commit()
 
     def update_password(self, user: User, new_hashed_password: str):

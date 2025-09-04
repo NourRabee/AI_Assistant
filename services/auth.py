@@ -2,9 +2,8 @@ import uuid
 
 from sqlalchemy.orm import Session
 
-from domain.mappers.user_mapper import UserMapper
-from domain.schemas.login_response import LogInResponse
-from domain.models import PasswordResetToken
+from domain.models import PasswordResetToken, User
+from domain.schemas.auth_schemas import LogInResponse, SignUpResponse
 from repositories.password_reset_token import PasswordResetTokenRepository
 from repositories.user_repo import UserRepository
 from services.email import EmailService
@@ -15,7 +14,6 @@ from services.password import PasswordService
 class AuthService:
     def __init__(self, db: Session):
         self.user_repo = UserRepository(db)
-        self.user_mapper = UserMapper()
         self.password_Service = PasswordService(db)
         self.jwt_service = JwtService()
         self.password_reset_token_repo = PasswordResetTokenRepository(db)
@@ -23,15 +21,18 @@ class AuthService:
 
     def register(self, request):
         if not self.user_repo.get_by_email(request.email):
-            request.password = self.password_Service.hashPassword(request.password)
-            user = self.user_mapper.signup_request_to_user(request)
-            self.user_repo.save(user)
+            request.password = self.password_Service.hash_password(request.password)
+            user = User(full_name=request.full_name, email=request.email, hashed_password=request.password)
+            self.user_repo.add(user)
+            self.user_repo.commit()
 
-            return self.user_mapper.user_to_signup_response(user)
+            return SignUpResponse(id=user.id)
+
+        return None
 
     def login(self, request):
         user = self.user_repo.get_by_email(request.email)
-        if user is None or not self.password_Service.verifyPassword(request.password, user.hashed_password):
+        if not user or not self.password_Service.verify_password(request.password, user.hashed_password):
             return None
 
         jwt_token = self.jwt_service.generate_jwt_token(user)
@@ -43,7 +44,8 @@ class AuthService:
             token=str(uuid.uuid4()),
             user_id=user.id
         )
-        self.password_reset_token_repo.save(generated_token)
+        self.password_reset_token_repo.add(generated_token)
+        self.password_reset_token_repo.commit()
         return generated_token
 
     async def request_password_reset(self, request):
@@ -68,9 +70,9 @@ class AuthService:
         user = self.user_repo.get_by_email(request.email)
 
         # checking if the entered password is the same as the one in the db.
-        if self.password_Service.verifyPassword(request.new_password, user.hashed_password):
+        if self.password_Service.verify_password(request.new_password, user.hashed_password):
             return False, "Password reset failed. Please ensure all information is correct and try again."
 
-        new_hashed_password = self.password_Service.hashPassword(request.new_password)
+        new_hashed_password = self.password_Service.hash_password(request.new_password)
         self.user_repo.update_password(user, new_hashed_password)
         return True, "Your password has been successfully reset. You can now log in with your new password."

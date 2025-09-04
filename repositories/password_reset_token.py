@@ -1,17 +1,10 @@
 from datetime import datetime, timezone
 
-from sqlalchemy.orm import Session
-
 from domain.models import PasswordResetToken
+from repositories.base_repo import BaseRepository
 
 
-class PasswordResetTokenRepository:
-    def __init__(self, db: Session):
-        self.db = db
-
-    def save(self, token: PasswordResetToken):
-        self.db.add(token)
-        self.db.commit()
+class PasswordResetTokenRepository(BaseRepository):
 
     def get_valid_token_by_user_id(self, user_id):
         now = datetime.now(timezone.utc)

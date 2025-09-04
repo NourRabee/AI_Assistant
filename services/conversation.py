@@ -10,7 +10,8 @@ class ConversationService:
 
     def create(self, user_id):
         conversation = Conversation(user_id=user_id)
-        self.conversation_repository.save(conversation)
+        self.conversation_repository.add(conversation)
+        self.conversation_repository.commit()
         return conversation.id
 
     def get(self, user_id, conversation_id):
@@ -20,7 +21,7 @@ class ConversationService:
 
     def update_last_activity(self, conversation):
         conversation.last_activity = datetime.now(timezone.utc)
-        self.conversation_repository.save(conversation)
+        self.conversation_repository.add(conversation)
 
 
 

@@ -11,8 +11,8 @@ class PasswordService:
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         self.user_repository = UserRepository(db)
 
-    def hashPassword(self, password):
+    def hash_password(self, password):
         return self.pwd_context.hash(password)
 
-    def verifyPassword(self, password, hashed_password):
+    def verify_password(self, password, hashed_password):
         return self.pwd_context.verify(password, hashed_password)

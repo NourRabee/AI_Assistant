@@ -30,7 +30,7 @@ def get_current_user_id(request: Request) -> int:
 
 @router.post("/")
 def create(user_id: int = Depends(get_current_user_id),
-           conv_service: ConversationService = Depends(get_conv_service), ):
+           conv_service: ConversationService = Depends(get_conv_service)):
     conversation_id = conv_service.create(user_id)
     return {"conversation_id": conversation_id}
 
@@ -51,10 +51,8 @@ def get(conversation_id: int, user_id: int = Depends(get_current_user_id),
 def send_message(request: MessageRequest, conversation_id: int, user_id: int = Depends(get_current_user_id),
                  msg_service: MessageService = Depends(get_msg_service),
                  llm_service: LLMService = Depends(get_llm_service)):
-    msg_service.create(conversation_id, request.prompt, user_id, is_ai=False)
+    msg_service.create(conversation_id, request.prompt, user_id, "user", commit=False)
     llm_response = llm_service.get_response(request.prompt, conversation_id, user_id)
-    msg_service.create(conversation_id, llm_response, user_id, is_ai=True)
+    msg_service.create(conversation_id, llm_response, user_id, "assistant")
 
     return llm_response
-
-
