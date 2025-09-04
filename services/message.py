@@ -15,7 +15,7 @@ class MessageService:
         self.llm_service = LLMService(db)
 
     def create(self, conversation_id, prompt, user_id, sender, commit=True):
-        conversation, messages = self.conv_service.get(user_id, conversation_id)
+        conversation, messages = self.conv_service.get_with_messages(user_id, conversation_id)
         if not conversation:
             return False
 

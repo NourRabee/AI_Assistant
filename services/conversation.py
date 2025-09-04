@@ -14,7 +14,7 @@ class ConversationService:
         self.conversation_repository.commit()
         return conversation.id
 
-    def get(self, user_id, conversation_id):
+    def get_with_messages(self, user_id, conversation_id):
         conversation, messages = self.conversation_repository.get_messages(user_id, conversation_id)
 
         return conversation, messages
@@ -22,6 +22,17 @@ class ConversationService:
     def update_last_activity(self, conversation):
         conversation.last_activity = datetime.now(timezone.utc)
         self.conversation_repository.add(conversation)
+
+    def update_title(self, conversation_id, user_id, title):
+        conversation = self.conversation_repository.get(conversation_id, user_id)
+        if not conversation:
+            return False
+
+        conversation.title = title
+        self.conversation_repository.add(conversation)
+        self.conversation_repository.commit()
+
+        return conversation
 
 
 
