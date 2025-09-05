@@ -12,7 +12,7 @@ class MessageService:
         self.base_repo = BaseRepository(db)
         self.conv_service = ConversationService(db)
         self.conv_repository = ConversationRepository(db)
-        self.llm_service = LLMService(db)
+        self.llm_service = LLMService()
 
     def create(self, conversation_id, prompt, user_id, sender, commit=True):
         conversation, messages = self.conv_service.get_with_messages(user_id, conversation_id)

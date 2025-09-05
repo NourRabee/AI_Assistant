@@ -19,8 +19,7 @@ def get_msg_service(db: Session = Depends(get_db)) -> MessageService:
     return MessageService(db)
 
 
-def get_llm_service(db: Session = Depends(get_db)) -> LLMService:
-    return LLMService(db)
+llm_service = LLMService()
 
 
 def get_current_user_id(request: Request) -> int:
@@ -50,10 +49,9 @@ def get(conversation_id: int, user_id: int = Depends(get_current_user_id),
 
 @router.post("/{conversation_id}/messages")
 def send_message(request: MessageRequest, conversation_id: int, user_id: int = Depends(get_current_user_id),
-                 msg_service: MessageService = Depends(get_msg_service),
-                 llm_service: LLMService = Depends(get_llm_service)):
+                 msg_service: MessageService = Depends(get_msg_service)):
     msg_service.create(conversation_id, request.prompt, user_id, "user", commit=False)
-    llm_response = llm_service.get_response(request.prompt, conversation_id, user_id)
+    llm_response = llm_service.get_response(request.prompt, str(conversation_id), str(user_id))
     msg_service.create(conversation_id, llm_response, user_id, "assistant")
 
     return llm_response
@@ -68,4 +66,3 @@ def update_title(request: UpdateConversationTitle, conversation_id: int, user_id
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
 
     return {"id": updated_conversation.id, "title": updated_conversation.title}
-

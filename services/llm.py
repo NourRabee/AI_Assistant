@@ -1,30 +1,39 @@
 from langchain_groq import ChatGroq
-from sqlalchemy.orm import Session
-
 from core.config import settings
+from utils.prompts import build_model_prompt
+from vector_store.pinecone_vectordb import PineconeStore
 
 
 class LLMService:
-    def __init__(self, db: Session):
-        pass
+    def __init__(self):
+        self.pinecone_vectordb = PineconeStore()
 
     def llm(self):
         llm = ChatGroq(
             groq_api_key=settings.GROQ_API_KEY,
-            model="deepseek-r1-distill-llama-70b",
-            temperature=0,
+            model="llama-3.1-8b-instant",
+            temperature=0.2,
             max_tokens=1024,
-            reasoning_format="parsed",
             timeout=60,
             max_retries=3,
         )
-
         return llm
 
     def get_response(self, prompt, conversation_id, user_id):
-        response = self.llm().invoke(prompt)
+        raw_result = self.pinecone_vectordb.search(prompt, conversation_id, user_id, namespace="conv_mem")
+        relevant_docs = self.pinecone_vectordb.get_text(raw_result)
 
-        return response.content if hasattr(response, "content") else response
+        formatted_prompt = build_model_prompt(prompt, relevant_docs)
+        print(formatted_prompt)
+
+        response = self.llm().invoke(formatted_prompt)
+
+        full_text = f"User: {prompt}\nAssistant: {response.content}"
+        docs = self.pinecone_vectordb.convert_text_to_list_doc(full_text, conversation_id, user_id)
+
+        self.pinecone_vectordb.upsert(docs, namespace="conv_mem")
+
+        return response.content
 
     def generate_title(self, first_message: str):
         response = self.llm().invoke([

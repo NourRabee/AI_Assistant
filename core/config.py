@@ -8,8 +8,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     EMAIL: str
     MAIL_PASSWORD: str
+
     GROQ_BASE_URL: str
     GROQ_API_KEY: str
+
+    PINECONE_API_KEY: str
+    PINECONE_INDEX: str
+
+    MISTRAL_API_KEY: str
+    MISTRAL_EMBEDDING_URL: str
 
     class Config:
         env_file = ".env"
