@@ -21,13 +21,13 @@ class PineconeStore:
             index=self.index,
             embedding=self.embedding,
             text_key="text",
-            namespace="conv_mem"
+            namespace="memory"
         )
 
-    def upsert(self, doc: List[Document], namespace="conv_mem"):
+    def upsert(self, doc: List[Document], namespace="memory"):
         self.vectorstore.add_documents(doc, namespace=namespace)
 
-    def search(self, prompt, conversation_id, user_id, top_k=5, namespace="conv_mem"):
+    def search(self, prompt, conversation_id, user_id, top_k=10, namespace="memory"):
         print(f"Searching in namespace={namespace} for user_id={user_id}, conversation_id={conversation_id}")
 
         retriever = self.vectorstore.as_retriever(
